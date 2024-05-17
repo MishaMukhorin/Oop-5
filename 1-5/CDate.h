@@ -1,224 +1,85 @@
 //
-// Created by Misha on 19.04.2024.
+// Created by mrLogic on 5/16/2024.
 //
 
 #ifndef OOP_5_CDATE_H
 #define OOP_5_CDATE_H
 
+#pragma once
+
+#include <stdexcept>
 #include <iostream>
-#include <cassert>
-#include <ctime>
+#include <string>
+#include <utility>
 
-const unsigned DAYS_IN_FOUR_YEARS = 1'461;
-const unsigned DAYS_IN_YEAR = 365;
-const unsigned DAYS_IN_LEAP_YEAR = 366;
-const unsigned DAYS_IN_FOUR_HUNDRED_YEARS = 146'097;
-const unsigned DAYS_BEFORE_2000 = 10'957;
-
-// Месяц
-enum Month: int
-{
-    JANUARY = 1, FEBRUARY = 2, MARCH = 3, APRIL = 4,
-    MAY = 5, JUNE = 6, JULY = 7, AUGUST = 8, SEPTEMBER = 9,
-    OCTOBER = 10, NOVEMBER = 11, DECEMBER = 12
-};
-
-// День недели
-enum WeekDay: int
-{
-    SUNDAY = 0, MONDAY = 1, TUESDAY = 2, WEDNESDAY = 3,
-    THURSDAY = 4, FRIDAY = 5, SATURDAY = 6
-};
-
-class CDate
-{
+class CDate {
 public:
-    // инициализируем дату заданными днем, месяцем и годом.
-    // примечание: год >= 1970
-    CDate(unsigned day, Month month, unsigned year)
-    {
-        if (year < 1970 || day > 31 || day < 1 || month < Month::JANUARY || month > Month::DECEMBER)
-            throw std::invalid_argument("Invalid date");
-        unsigned years = year - 1970;
-        unsigned totalDays = 0;
-        totalDays += years * 365 + GetNumOfLeapYearsByYear(year);
-        for (int i = 1; i < (month); i++)
-        {
-            totalDays += s_numDays[i];
-            if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) && i == 1)
-            {
-                totalDays++;
-            }
-        }
-        totalDays += day - 1;
-        m_timestamp = totalDays;
-    }
+    enum class Month {
+        JANUARY = 1, FEBRUARY, MARCH, APRIL,
+        MAY, JUNE, JULY, AUGUST, SEPTEMBER,
+        OCTOBER, NOVEMBER, DECEMBER
+    };
 
-    // инициализируем дату количеством дней, прошедших после 1 января 1970 года
-    explicit CDate(unsigned timestamp)
-    {
-        m_timestamp = timestamp;
-    }
+    enum class WeekDay {
+        SUNDAY = 0, MONDAY, TUESDAY, WEDNESDAY,
+        THURSDAY, FRIDAY, SATURDAY
+    };
 
-    // Конструктор по умолчанию. Создаёт дату, равную 1 января 1970.
-    CDate()
-    {
-        m_timestamp = 0;
-    }
+    CDate(unsigned day, Month month, unsigned year);
+    explicit CDate(unsigned timestamp);
+    CDate();
 
-    // возвращает день месяца (от 1 до 31)
     [[nodiscard]] unsigned GetDay() const;
-
-    // возвращает месяц
     [[nodiscard]] Month GetMonth() const;
-
-    // возвращает год
     [[nodiscard]] unsigned GetYear() const;
-
-    // возвращает день недели
     [[nodiscard]] WeekDay GetWeekDay() const;
 
-    // возвращает информацию о корректности хранимой даты.
     [[nodiscard]] bool IsValid() const;
 
-    // переводит дату на следующий день
     CDate& operator++();
-
-    // переводит дату на следующий день (постфиксная форма)
     CDate operator++(int);
-
-    // переводит дату на предыдущий день
     CDate& operator--();
-
-    // переводит дату на предыдущий день (постфиксная форма)
     CDate operator--(int);
 
-    // прибавляет к дате заданное целое количество дней
-    CDate& operator+=(unsigned days);
+    CDate operator+(int days) const;
+    friend CDate operator+(int days, const CDate& date);
+    CDate operator-(int days) const;
+    int operator-(const CDate& date) const;
 
-    // вычитает из даты заданное целое количество дней
-    CDate& operator-=(unsigned days);
+    CDate& operator+=(int days);
+    CDate& operator-=(int days);
 
-    // возвращает разность двух дат в днях
-    int operator-(const CDate& rhs) const;
+    friend std::ostream& operator<<(std::ostream& os, const CDate& date);
+    friend std::istream& operator>>(std::istream& is, CDate& date);
 
-
-    // вводит дату из потока ввода в формате ДД.ММ.ГГГГ
-    CDate operator>>(std::istream& is) const;
-
-    // проверяет равенство двух дат
-    bool operator==(const CDate& rhs) const
-    {
-        return m_timestamp == rhs.m_timestamp;
-    }
-
-    // проверяет неравенство двух дат
-    bool operator!=(const CDate& rhs) const
-    {
-        return !operator==(rhs);
-    }
-
-    // проверяет строгое неравенство двух дат
-    bool operator<(const CDate& rhs) const
-    {
-        return m_timestamp < rhs.m_timestamp;
-    }
-
-    // проверяет строгое неравенство двух дат
-    bool operator>(const CDate& rhs) const
-    {
-        return m_timestamp > rhs.m_timestamp;
-    }
-
-    // проверяет нестрогое неравенство двух дат
-    bool operator<=(const CDate& rhs) const
-    {
-        return !operator>(rhs);
-    }
-
-    // проверяет нестрогое неравенство двух дат
-    bool operator>=(const CDate& rhs) const
-    {
-        return !operator<(rhs);
-    }
-
-    [[nodiscard]] static unsigned GetNumOfLeapYearsBefore(unsigned numOfDays)
-    {
-        unsigned year = 1970;
-        unsigned numOfLeapYearsBefore = 0;
-        unsigned numOfYearsBefore = 0;
-        unsigned i = 1;
-        if (numOfDays > 365)
-        {
-            if (numOfDays > DAYS_BEFORE_2000)
-            {
-                numOfYearsBefore += 30;
-                numOfLeapYearsBefore += 7;
-                numOfDays -= DAYS_BEFORE_2000;
-                numOfYearsBefore += numOfDays / DAYS_IN_FOUR_HUNDRED_YEARS * 400;
-                numOfLeapYearsBefore += numOfDays / DAYS_IN_FOUR_HUNDRED_YEARS * 97;
-                numOfDays %= DAYS_IN_FOUR_HUNDRED_YEARS;
-            }
-            numOfYearsBefore += numOfDays / DAYS_IN_FOUR_YEARS * 4;
-            numOfLeapYearsBefore += numOfDays / DAYS_IN_FOUR_YEARS;
-            numOfDays %= DAYS_IN_FOUR_YEARS;
-            year += numOfYearsBefore;
-            for (int j = 0; j < 3; ++j)
-            {
-                if (IsLeapYear(year))
-                {
-                    numOfDays -= DAYS_IN_LEAP_YEAR;
-                    numOfLeapYearsBefore++;
-                }
-                else
-                {
-                    numOfDays -= DAYS_IN_YEAR;
-                }
-                year++;
-            }
-        }
-        return numOfLeapYearsBefore;
-    }
-
-    [[nodiscard]] static unsigned GetNumOfLeapYearsByYear(unsigned year)
-    {
-        unsigned years = year - 1970;
-        unsigned numOfLeapYearsBefore = 0;
-        unsigned i = 1;
-
-        if (years > 30)
-        {
-            numOfLeapYearsBefore += 7;
-            years -= 30;
-            numOfLeapYearsBefore += years / 400 * 97;
-            years %= 400;
-        }
-        numOfLeapYearsBefore += years / 4;
-        years %= 4;
-        for (int j = 0; j < 3; ++j)
-        {
-            if (IsLeapYear(years + 1970))
-            {
-                numOfLeapYearsBefore++;
-            }
-            years++;
-        }
-        
-        return numOfLeapYearsBefore;
-    }
+    bool operator==(const CDate& date) const;
+    bool operator!=(const CDate& date) const;
+    bool operator<(const CDate& date) const;
+    bool operator>(const CDate& date) const;
+    bool operator<=(const CDate& date) const;
+    bool operator>=(const CDate& date) const;
 
 private:
+    static constexpr unsigned START_YEAR = 1970;
+    static constexpr unsigned END_YEAR = 9999;
+    static constexpr unsigned MAX_DAYS_COUNT = 2932896; // 31/12/9999 is 2932896 days after 1/1/1970
+    static constexpr unsigned DAYS_IN_WEEK = 7;
+
     unsigned m_timestamp;
 
-    constexpr static const unsigned s_numDays[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-    // проверяет, является ли год високосным
-    [[nodiscard]] static bool IsLeapYear(unsigned year)
-    {
-        return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
-    }
+    static bool IsLeapYear(unsigned year);
+    static unsigned DaysInMonth(Month month, unsigned year);
+    static unsigned CalculateDays(unsigned day, Month month, unsigned year);
+    static unsigned CalculateDaysByYear(unsigned year);
+    static std::pair<unsigned, unsigned> CalculateYearsAndRemainsDays(unsigned int year, unsigned int days);
+    static std::pair<Month, unsigned> CalculateMonthAndRemainsDays(unsigned int days, unsigned year);
+
+    [[maybe_unused]] static bool HasDivisible(unsigned int divider, unsigned start, unsigned end);
 };
 
+
 std::ostream& operator<<(std::ostream& os, const CDate& date);
+std::istream& operator>>(std::istream& is, CDate& date);
 
 
 #endif //OOP_5_CDATE_H
