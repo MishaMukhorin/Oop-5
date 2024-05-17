@@ -17,12 +17,9 @@ FetchContent_MakeAvailable(googletest)
 add_executable(DateOut 1-5/CDate.cpp 1-5/CDate.h 1-5/tests/CDateTests.cpp)
 add_executable(DateTests 1-5/tests/CDateTests.cpp 1-5/CDate.cpp)
 
-
-target_link_libraries(DateTests gtest)
-
-
 add_executable(CMyString 2-1/CMyString.cpp)
 add_executable(CMyStringTests 2-1/tests/CMyStringTests.cpp 2-1/CMyString.cpp)
 
+target_link_libraries(DateTests gtest)
 target_link_libraries(CMyStringTests gtest)
 
