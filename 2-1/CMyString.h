@@ -94,11 +94,6 @@ CMyString operator+(std::string const& stlString, CMyString const& myString);
 CMyString operator+(const char* pString, CMyString const& myString);
 
 
-std::ostream& operator<<(std::ostream& os, CMyString const& myString);
-std::istream& operator>>(std::istream& is, CMyString& myString);
-
-
-
 // Iterator classes
 class CMyString::Iterator
 {
@@ -112,7 +107,7 @@ public:
     explicit Iterator(char* ptr) : m_ptr(ptr) {}
 
     reference operator*() { return *m_ptr; }
-    Iterator& operator++() { ++m_ptr; return *this; }
+    Iterator& operator++() { ++m_ptr; return *this; } //todo out of range
     Iterator operator++(int) { Iterator temp = *this; ++(*this); return temp; }
     Iterator& operator--() { --m_ptr; return *this; }
     Iterator operator--(int) { Iterator temp = *this; --(*this); return temp; }

@@ -29,12 +29,28 @@ TEST(CreateTest, CreatedWithLength)
     EXPECT_STREQ(str.GetStringData(), "test");
 }
 
-TEST(CreateTest, CreatedWithLengthAndEndPoint)
+TEST(CreateTest, CreatedEndPoint)
+{
+    CMyString str("test\0 string");
+    //EXPECT_EQ(str.GetLength(), 12); //todo
+   // EXPECT_EQ(str.GetCapacity(), 13);
+   // XPECT_STREQ(str.GetStringData(), "test\0 string");
+}
+
+TEST(CreateTest, CreatedWithLengthLess)
 {
     CMyString str("test\0 string", 10);
     EXPECT_EQ(str.GetLength(), 10);
     EXPECT_EQ(str.GetCapacity(), 11);
     EXPECT_STREQ(str.GetStringData(), "test\0 stri");
+}
+
+TEST(CreateTest, CreateStringLessThenLength)
+{
+    CMyString str("test st", 10);
+    EXPECT_EQ(str.GetLength(), 10);
+    EXPECT_EQ(str.GetCapacity(), 11);
+    EXPECT_STREQ(str.GetStringData(), "test st");
 }
 
 TEST(CreateTest, CreatedFromSTDString)
@@ -351,7 +367,7 @@ TEST(IteratorTest, RangeBasedLoop)
     std::string stlStr2;
     for (auto ch : str1)
     {
-        stlStr2 += ch;
+        stlStr2 += ch; //todo copy, sort, min_val, max_val...
     }
     EXPECT_EQ(stlStr1, "data");
     EXPECT_EQ(stlStr2, "data");
@@ -374,7 +390,7 @@ TEST(IteratorTest, ReverseIteration)
         reversed2 += *it;
     }
 
-    EXPECT_EQ(reversed1, "atad");
+    EXPECT_EQ(reversed1, "atad");  //
     EXPECT_EQ(reversed2, "atad");
 }
 

@@ -139,6 +139,7 @@ bool CMyString::operator<(CMyString const& other) const
 {
     return strcmp(m_pData, other.m_pData) > 0;
 }
+//todo check "ckdkd\0dd"
 
 bool CMyString::operator>(CMyString const& other) const
 {
@@ -187,7 +188,7 @@ CMyString CMyString::SubString(size_t start, size_t length) const
     {
         return {};
     }
-    length = std::min(length, m_length - start);
+    length = std::min(length, m_length - start); // todo обработать вариант когда строка длиннее
     return {m_pData + start, length};
 }
 
@@ -195,7 +196,7 @@ void CMyString::Clear()
 {
     m_length = 0;
     m_capacity = 1;
-    m_pData[0] = '\0';
+    m_pData[0] = '\0'; //todo нужно удалить остальное
 }
 
 size_t CMyString::GetCapacity() const
