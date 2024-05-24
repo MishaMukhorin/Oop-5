@@ -367,7 +367,7 @@ TEST(IteratorTest, RangeBasedLoop)
     std::string stlStr2;
     for (auto ch : str1)
     {
-        stlStr2 += ch; //todo copy, sort, min_val, max_val...
+        stlStr2 += ch;
     }
     EXPECT_EQ(stlStr1, "data");
     EXPECT_EQ(stlStr2, "data");
@@ -392,6 +392,37 @@ TEST(IteratorTest, ReverseIteration)
 
     EXPECT_EQ(reversed1, "atad");  //
     EXPECT_EQ(reversed2, "atad");
+}
+//done copy, sort, min_val, max_val...
+
+TEST(CMyStringTest, StdCopy)
+{
+    CMyString myStr("Hello, World!");
+    std::string copiedStr;
+
+    std::copy(myStr.begin(), myStr.end(), std::back_inserter(copiedStr));
+
+    EXPECT_EQ(copiedStr, "Hello, World!");
+}
+
+TEST(CMyStringTest, StdSort)
+{
+    CMyString myStr("dcba");
+
+    std::sort(myStr.begin(), myStr.end());
+
+    EXPECT_STREQ(myStr.GetStringData(), "abcd");
+}
+
+TEST(CMyStringTest, StdMinMaxElement)
+{
+    CMyString myStr("hello");
+
+    auto minIt = std::min_element(myStr.begin(), myStr.end());
+    auto maxIt = std::max_element(myStr.begin(), myStr.end());
+
+    EXPECT_EQ(*minIt, 'e');
+    EXPECT_EQ(*maxIt, 'o');
 }
 
 TEST(IteratorTest, TransformToUppercase)

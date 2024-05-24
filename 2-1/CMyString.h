@@ -95,7 +95,7 @@ CMyString operator+(const char* pString, CMyString const& myString);
 
 
 // Iterator classes
-class CMyString::Iterator
+class CMyString::Iterator: public std::error_code
 {
 public:
     using iterator_category = std::random_access_iterator_tag;
